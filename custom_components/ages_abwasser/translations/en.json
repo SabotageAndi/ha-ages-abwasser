@@ -1,0 +1,127 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up AGES wastewater monitoring",
+        "description": "SARS-CoV-2 wastewater data for all wastewater treatment plants reported by AGES in Austria. Four sensors are added per plant. Data is retrieved once a day."
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to AGES.",
+      "timeout": "Timed out while retrieving AGES data.",
+      "invalid_data": "AGES did not return usable wastewater treatment plant data.",
+      "unknown": "Unexpected error during setup. Further details are available in the Home Assistant log."
+    },
+    "abort": {
+      "already_configured": "AGES wastewater monitoring is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "viral_load": {
+        "name": "Viral load",
+        "state_attributes": {
+          "federal_state": {
+            "name": "Federal state"
+          },
+          "current_week_missing": {
+            "name": "Current sampling week missing",
+            "state": {
+              "true": "Yes",
+              "false": "No"
+            }
+          },
+          "source_value": {
+            "name": "Original AGES value"
+          },
+          "sample_date": {
+            "name": "Last sample date"
+          }
+        }
+      },
+      "sample_date": {
+        "name": "Sample date",
+        "state_attributes": {
+          "federal_state": {
+            "name": "Federal state"
+          },
+          "current_week_missing": {
+            "name": "Current sampling week missing",
+            "state": {
+              "true": "Yes",
+              "false": "No"
+            }
+          }
+        }
+      },
+      "trend": {
+        "name": "AGES trend",
+        "state": {
+          "decreasing": "Decreasing",
+          "stable": "Stable",
+          "moderate_increase": "Moderate increase",
+          "strong_increase": "Strong increase",
+          "stable_low": "Stable at a low level",
+          "no_data": "No trend data"
+        },
+        "state_attributes": {
+          "federal_state": {
+            "name": "Federal state"
+          },
+          "current_week_missing": {
+            "name": "Current sampling week missing",
+            "state": {
+              "true": "Yes",
+              "false": "No"
+            }
+          },
+          "trend_percent": {
+            "name": "Trend change in percent"
+          },
+          "trend_week": {
+            "name": "Start of the official trend week"
+          }
+        }
+      },
+      "measurement_status": {
+        "name": "Measurement status",
+        "state": {
+          "quantified": "Quantified",
+          "below_detection_limit": "Below the detection limit",
+          "below_quantification_limit": "Below the quantification limit",
+          "no_data": "No measurement data",
+          "no_current_sample": "No current sample"
+        },
+        "state_attributes": {
+          "federal_state": {
+            "name": "Federal state"
+          },
+          "current_week_missing": {
+            "name": "Current sampling week missing",
+            "state": {
+              "true": "Yes",
+              "false": "No"
+            }
+          },
+          "source_value": {
+            "name": "Original AGES value"
+          },
+          "measurement_status": {
+            "name": "Last sample measurement status",
+            "state": {
+              "quantified": "Quantified",
+              "below_detection_limit": "Below the detection limit",
+              "below_quantification_limit": "Below the quantification limit",
+              "no_data": "No measurement data"
+            }
+          }
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_data": {
+      "message": "AGES data could not be processed: {error}"
+    }
+  }
+}

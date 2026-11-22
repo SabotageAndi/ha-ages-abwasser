@@ -1,0 +1,127 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "AGES-Abwassermonitoring einrichten",
+        "description": "SARS-CoV-2-Abwasserdaten für alle von AGES gemeldeten Kläranlagen in Österreich. Pro Anlage werden vier Sensoren angelegt. Der Datenabruf erfolgt einmal täglich."
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu AGES fehlgeschlagen.",
+      "timeout": "Zeitüberschreitung beim Abruf der AGES-Daten.",
+      "invalid_data": "AGES hat keine verwendbaren Kläranlagendaten geliefert.",
+      "unknown": "Unerwarteter Fehler beim Einrichten. Weitere Angaben stehen im Home-Assistant-Protokoll."
+    },
+    "abort": {
+      "already_configured": "Das AGES-Abwassermonitoring ist bereits eingerichtet."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "viral_load": {
+        "name": "Viruslast",
+        "state_attributes": {
+          "federal_state": {
+            "name": "Bundesland"
+          },
+          "current_week_missing": {
+            "name": "Aktuelle Probewoche fehlt",
+            "state": {
+              "true": "Ja",
+              "false": "Nein"
+            }
+          },
+          "source_value": {
+            "name": "AGES-Originalwert"
+          },
+          "sample_date": {
+            "name": "Datum der letzten Probe"
+          }
+        }
+      },
+      "sample_date": {
+        "name": "Probedatum",
+        "state_attributes": {
+          "federal_state": {
+            "name": "Bundesland"
+          },
+          "current_week_missing": {
+            "name": "Aktuelle Probewoche fehlt",
+            "state": {
+              "true": "Ja",
+              "false": "Nein"
+            }
+          }
+        }
+      },
+      "trend": {
+        "name": "AGES-Trend",
+        "state": {
+          "decreasing": "Abnehmend",
+          "stable": "Gleichbleibend",
+          "moderate_increase": "Moderate Zunahme",
+          "strong_increase": "Starke Zunahme",
+          "stable_low": "Gleichbleibend niedrig",
+          "no_data": "Keine Trenddaten"
+        },
+        "state_attributes": {
+          "federal_state": {
+            "name": "Bundesland"
+          },
+          "current_week_missing": {
+            "name": "Aktuelle Probewoche fehlt",
+            "state": {
+              "true": "Ja",
+              "false": "Nein"
+            }
+          },
+          "trend_percent": {
+            "name": "Trendänderung in Prozent"
+          },
+          "trend_week": {
+            "name": "Beginn der offiziellen Trendwoche"
+          }
+        }
+      },
+      "measurement_status": {
+        "name": "Messstatus",
+        "state": {
+          "quantified": "Quantifiziert",
+          "below_detection_limit": "Unter der Nachweisgrenze",
+          "below_quantification_limit": "Unter der Bestimmungsgrenze",
+          "no_data": "Keine Messdaten",
+          "no_current_sample": "Keine aktuelle Probe"
+        },
+        "state_attributes": {
+          "federal_state": {
+            "name": "Bundesland"
+          },
+          "current_week_missing": {
+            "name": "Aktuelle Probewoche fehlt",
+            "state": {
+              "true": "Ja",
+              "false": "Nein"
+            }
+          },
+          "source_value": {
+            "name": "AGES-Originalwert"
+          },
+          "measurement_status": {
+            "name": "Messstatus der letzten Probe",
+            "state": {
+              "quantified": "Quantifiziert",
+              "below_detection_limit": "Unter der Nachweisgrenze",
+              "below_quantification_limit": "Unter der Bestimmungsgrenze",
+              "no_data": "Keine Messdaten"
+            }
+          }
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_data": {
+      "message": "AGES-Daten konnten nicht verarbeitet werden: {error}"
+    }
+  }
+}
