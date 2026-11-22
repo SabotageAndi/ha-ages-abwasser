@@ -61,6 +61,12 @@ python -m unittest discover -s tests -v
 
 Die Regressionstests prüfen Probedaten, Nachweisgrenzen, Messlücken, Mehrfachproben, mehrdeutige Zuordnungen und fehlerhafte oder widersprüchliche Quellen. GitHub Actions führt diese Prüfungen bei Pushes und Pull Requests aus.
 
+## Lizenz
+
+Der Quellcode und die zugehörige Dokumentation stehen unter der [MIT-Lizenz](LICENSE).
+
+Die von AGES abgerufenen Messdaten sind davon nicht umfasst. Für ihre Nutzung gelten die jeweiligen Nutzungsbedingungen der Datenquelle; dieses Projekt räumt keine Rechte an den AGES-Daten ein.
+
 ## Quellen
 
 - [AGES: SARS-CoV-2-Abwassermonitoring, Einheiten und Trendberechnung](https://abwasser.ages.at/de/#SARSCOV2)
