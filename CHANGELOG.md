@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.1.1
+
+- Reguläre SockJS-Sitzungskennungen, Cache-Buster und Sequenzbestätigungen für aufeinanderfolgende Abrufe mit derselben Home-Assistant-HTTP-Sitzung.
+
 ## 0.1.0
 
 - SARS-CoV-2-Abwassermonitoring aller von AGES verfügbaren österreichischen Kläranlagen.

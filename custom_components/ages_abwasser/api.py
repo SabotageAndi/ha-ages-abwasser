@@ -10,7 +10,9 @@ from html import unescape
 from io import StringIO
 import json
 import math
+import random
 import re
+import time
 from urllib.parse import urljoin, urlsplit
 from uuid import uuid4
 
@@ -246,12 +248,20 @@ class _ShinySession:
 
     def __init__(self, session: aiohttp.ClientSession) -> None:
         self._session = session
-        self._url = BASE_URL + "__sockjs__/000/" + uuid4().hex
+        # Dieselben Sitzungs- und Transportparameter wie shiny-server-client.
+        robust_id = uuid4().hex[:20]
+        server_id = f"{random.randrange(1000):03d}"
+        session_id = uuid4().hex[:8]
+        self._url = f"{BASE_URL}__sockjs__/n={robust_id}/{server_id}/{session_id}"
         self._opened = False
+        self._sent = 0
+        self._received = 0
+        self._acked = 0
 
     async def _post(self, endpoint: str, messages: list[str] | None = None) -> str:
         async with self._session.post(
             self._url + "/" + endpoint,
+            params={"t": time.time_ns() // 1_000_000},
             data=json.dumps(messages) if messages is not None else None,
             headers={"Content-Type": "application/json"},
             timeout=aiohttp.ClientTimeout(total=35),
@@ -259,8 +269,18 @@ class _ShinySession:
             response.raise_for_status()
             return await response.text()
 
+    async def _send(self, messages: list[str]) -> None:
+        tagged = []
+        for message in messages:
+            tagged.append(f"{self._sent:X}#{message}")
+            self._sent += 1
+        if self._received > self._acked:
+            tagged.append(f"ACK {self._received:X}")
+        await self._post("xhr_send", tagged)
+        self._acked = self._received
+
     async def _update(self, data: dict) -> None:
-        await self._post("xhr_send", ["0|m|" + json.dumps({"method": "update", "data": data})])
+        await self._send(["0|m|" + json.dumps({"method": "update", "data": data})])
 
     async def read_data(self) -> tuple[str, dict, date]:
         if (await self._post("xhr")).strip() != "o":
@@ -277,7 +297,7 @@ class _ShinySession:
             ".clientdata_url_hostname": "abwasser.ages.at",
             ".clientdata_url_pathname": "/de/",
         }
-        await self._post("xhr_send", [
+        await self._send([
             "0|o|",
             "0|m|" + json.dumps({"method": "init", "data": initial}),
         ])
@@ -291,6 +311,15 @@ class _ShinySession:
             if not frame.startswith("a"):
                 raise AGESDataError("AGES-Shiny-Verbindung wurde geschlossen")
             for message in json.loads(frame[1:]):
+                if not isinstance(message, str):
+                    raise AGESDataError("Ungültiger SockJS-Nachrichtentyp")
+                if message.startswith("ACK "):
+                    continue
+                tagged = re.fullmatch(r"([0-9A-F]+)#([\s\S]*)", message)
+                if not tagged:
+                    raise AGESDataError("SockJS-Nachricht ohne Sequenzkennung")
+                self._received = int(tagged.group(1), 16) + 1
+                message = tagged.group(2)
                 if message.startswith("0|c|"):
                     raise AGESDataError("AGES hat den Datenkanal geschlossen")
                 if not message.startswith("0|m|"):
@@ -317,6 +346,9 @@ class _ShinySession:
                         trend_week = max(date.fromisoformat(day) for day in dates)
                 if values.get(DOWNLOAD):
                     csv_text = await self._download(values[DOWNLOAD])
+            if self._received > self._acked:
+                await self._post("xhr_send", [f"ACK {self._received:X}"])
+                self._acked = self._received
         return csv_text, trend_map, trend_week
 
     async def _download(self, path: str) -> str:
@@ -339,7 +371,7 @@ class _ShinySession:
             return
         try:
             async with asyncio.timeout(3):
-                await self._post("xhr_send", ['0|c|{"code":1000,"reason":"Complete"}'])
+                await self._send(['0|c|{"code":1000,"reason":"Complete"}'])
         except (aiohttp.ClientError, TimeoutError):
             pass  # Die begrenzte Export-Sitzung ist eventuell bereits abgelaufen.
         finally:
